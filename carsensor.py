@@ -20,6 +20,7 @@ HEADERS = {"User-Agent": UA, "Accept-Language": "ja,en;q=0.8"}
 TIMEOUT = 30
 SLEEP = getattr(config, "REQUEST_SLEEP", 1.5)
 MAX_PAGES = getattr(config, "MAX_PAGES", 6)
+DEBUG = True   # 失敗診断用。安定後 False に
 
 # 結果一覧より後ろ（おすすめ/比較/リース/フッター）を切り落とすマーカー
 CUT_MARKERS = ["よく一緒に検討されている", "お探しの車種でリース", "最新情報をお届け",
@@ -50,7 +51,8 @@ def _cut_footer(html):
     return html[:idx]
 
 def _parse_count(html):
-    m = re.search(r"(\d{1,4})\s*台\s*検索する", html) or re.search(r"(\d{1,4})\s*台", html)
+    txt = BeautifulSoup(html, "html.parser").get_text(" ", strip=True)
+    m = re.search(r"(\d{1,4})\s*台\s*検索する", txt)
     return int(m.group(1)) if m else None
 
 def _num_after(text, label, unit, window=40):
@@ -65,7 +67,7 @@ def _year(text):
     i = text.find("年式")
     if i < 0:
         return None
-    m = re.search(r"(20\d{2})", text[i: i + 20])
+    m = re.search(r"(20\d{2})", text[i: i + 24])
     return int(m.group(1)) if m else None
 
 def _distance_and_city(text, pref_name, pref_km):
@@ -76,19 +78,22 @@ def _distance_and_city(text, pref_name, pref_km):
 
 def parse_card(card_html, pref_name, pref_km):
     text = BeautifulSoup(card_html, "html.parser").get_text(" ", strip=True)
-    # グレード：get_text上「ジェイド <grade> 支払総額 …」（画像altは除外されるため最初のジェイドが車名見出し）
-    mg = re.search(r"ジェイド\s+(.+?)\s+支払総額", text)
-    grade = mg.group(1).strip() if mg else None
-    price = _num_after(text, "支払総額", "万円")
+    # グレード：生HTMLの見出しリンク <a ...>ジェイド GRADE</a> から直接（get_text順序に依存しない）
+    mg = re.search(r">\s*ジェイド\s*([^<]{1,140}?)\s*</a>", card_html)
+    grade = re.sub(r"\s+", " ", mg.group(1)).strip() if mg else None
+    price = _num_after(text, "支払総額", "万円", window=60)
+    if price is None:
+        price = _num_after(text, "車両本体価格", "万円", window=60)
     year = _year(text)
-    mil = _num_after(text, "走行距離", "万km", window=16)
-    mr = re.search(r"修復歴\s*(なし|あり|無|有)", text)
+    mil = _num_after(text, "走行距離", "万km", window=24)
+    mr = re.search(r"修復歴\s*[:：]?\s*(なし|あり|無|有)", text)
     repair = ("なし" if mr and mr.group(1) in ("なし", "無") else ("あり" if mr else None))
     mp = _PREF_RE.search(text)
     pref = mp.group(1).replace("県","").replace("都","").replace("府","") if mp else pref_name
     dist, city = _distance_and_city(text, pref_name, pref_km)
     return {"grade": grade, "price": price, "year": year, "mil": mil,
-            "repair": repair, "pref": pref, "city": city, "dist": dist}
+            "repair": repair, "pref": pref, "city": city, "dist": dist,
+            "_text": text}
 
 def _cards(html):
     """詳細IDの初出位置でHTMLをカードに分割。返り値 [(auid, card_html)]"""
@@ -116,6 +121,12 @@ def fetch_prefecture(area_code, pref_name, pref_km):
         if n == 1:
             count = _parse_count(html)
         cards = _cards(html)
+        if n == 1 and DEBUG:
+            print(f"[dbg] {pref_name} page1 cards={len(cards)} count={count}", file=sys.stderr)
+            if cards:
+                d0 = parse_card(cards[0][1], pref_name, pref_km)
+                print(f"[dbg] sample grade={d0['grade']!r} year={d0['year']} mil={d0['mil']} price={d0['price']} repair={d0['repair']} pref={d0['pref']} city={d0['city']}", file=sys.stderr)
+                print("[dbg] text=" + repr(d0.get('_text','')[:400]), file=sys.stderr)
         new_ct = 0
         for auid, chtml in cards:
             if auid in seen:
