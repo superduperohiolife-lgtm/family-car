@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Honda ジェイド 中古車 スコアリング Top10（宇都宮起点・毎日更新）</title>
+<style>
+:root{--ink:#1a1f26;--sub:#5c6773;--line:#e3e8ee;--bg:#f6f8fa;--card:#fff;--accent:#2a7de1;}
+*{box-sizing:border-box}
+body{font-family:"Meiryo UI","Meiryo",Calibri,sans-serif;color:var(--ink);margin:0;background:var(--bg);line-height:1.6}
+.wrap{max-width:1160px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:22px;margin:0 0 4px}
+.lead{color:var(--sub);font-size:13px;margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi .l{font-size:11px;color:var(--sub)}
+.kpi .v{font-size:18px;font-weight:700;margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px 6px;margin:18px 0}
+h2{font-size:15px;margin:2px 0 12px;padding-left:10px;border-left:4px solid var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:8px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#f0f4f8;font-size:11px;color:#37424e;white-space:nowrap}
+td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.rk{font-weight:700;color:var(--accent);text-align:center}
+td.sc b{font-size:15px}
+td.gr{max-width:210px;font-size:11.5px;color:#2c3540}
+.city{color:var(--sub);font-size:11px}
+td.dist{color:#7a4a12}
+tr.toprow{background:#fbfdff}
+a{color:var(--accent);text-decoration:none;font-weight:600;white-space:nowrap}
+a:hover{text-decoration:underline}
+.bar{position:relative;background:#eef1f5;border-radius:5px;height:16px;min-width:64px;overflow:hidden}
+.bar span{position:absolute;left:0;top:0;bottom:0;border-radius:5px;opacity:.85}
+.bar b{position:relative;font-size:10px;padding-left:5px;line-height:16px;color:#22303c}
+details{margin-top:8px}
+summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--accent);padding:6px 0}
+.note{font-size:12px;color:#37424e}
+.note ul{margin:6px 0 6px 2px;padding-left:18px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--sub);margin:0 0 10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.tag{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:20px;border:1px solid;margin-right:4px}
+.tag.ok{color:#137a52;border-color:#9dd9bf;background:#eafaf2}
+.tag.est{color:#8a5a12;border-color:#e6c896;background:#fdf5e7}
+.src{font-size:11.5px;color:var(--sub)}
+.foot{font-size:11px;color:#8894a0;margin-top:24px;text-align:center}
+.warn{background:#fff8ec;border:1px solid #f0dcae;border-radius:10px;padding:12px 14px;font-size:12px;color:#6a5215;margin:14px 0}
+</style></head>
+<body><div class="wrap">
+<h1>Honda ジェイド 中古車 スコアリング Top10</h1>
+<p class="lead">起点＝宇都宮／対象＝車で片道約2時間圏（栃木・群馬・茨城・埼玉・福島）／修復歴なし・支払総額{{BUDGET}}万円以下／重み＝距離{{W_D}}・新しさ{{W_N}}・価格{{W_P}}／出典：カーセンサー実掲載ページ／<b>自動更新：{{DATE}}</b></p>
+
+<div class="grid">
+<div class="kpi"><div class="l">母集団（条件通過）</div><div class="v">{{N}}台</div></div>
+<div class="kpi"><div class="l">対象県</div><div class="v">{{NPREF}}県</div></div>
+<div class="kpi"><div class="l">スコア重み</div><div class="v">距離{{W_D}}・新しさ{{W_N}}・価格{{W_P}}</div></div>
+<div class="kpi"><div class="l">除外</div><div class="v">修復歴あり／{{BUDGET}}万超</div></div>
+</div>
+
+<div class="warn">
+<b>データ区分（事実提示プロトコル準拠）</b><br>
+<span class="tag ok">&#10003;確定</span>年式・走行距離・支払総額・修復歴・所在地・URL＝カーセンサー実掲載ページ（準一次）<br>
+<span class="tag est">&#9651;推定</span>宇都宮からの距離(km)＝市区町村の代表道路距離の推定値。総合スコアはこの推定距離を含む算出値。実在庫・価格は変動するため商談前に各リンクで要再確認。
+</div>
+
+<div class="card">
+<h2>Top10（総合スコア順）</h2>
+<div class="legend">
+<span><i style="background:#2a7de1"></i>距離（近いほど高）</span>
+<span><i style="background:#17a673"></i>新しさ（年式＋走行の平均）</span>
+<span><i style="background:#e0902a"></i>価格（安いほど高）</span>
+<span>総合＝距離{{W_D}}・新しさ{{W_N}}・価格{{W_P}}の加重平均（各0–100・min-max正規化）</span>
+</div>
+<div style="overflow-x:auto">
+<table><thead><tr>
+<th>#</th><th>総合</th><th>所在</th><th>グレード</th><th>年式</th><th>走行<br>万km</th><th>支払総額<br>万円</th><th>距離<br>~km&#9651;</th>
+<th>距離</th><th>新しさ</th><th>価格</th><th>物件</th>
+</tr></thead><tbody>
+{{ROWS_TOP}}
+</tbody></table></div>
+
+<details><summary>&#9660; 11位以下 全物件のスコアも表示</summary>
+<div style="overflow-x:auto">
+<table><thead><tr>
+<th>#</th><th>総合</th><th>所在</th><th>グレード</th><th>年式</th><th>走行<br>万km</th><th>支払総額<br>万円</th><th>距離<br>~km&#9651;</th>
+<th>距離</th><th>新しさ</th><th>価格</th><th>物件</th>
+</tr></thead><tbody>
+{{ROWS_REST}}
+</tbody></table></div>
+</details>
+</div>
+
+<div class="card">
+<h2>スコア算出方法</h2>
+<div class="note">
+各指標を対象{{N}}台の中で min-max 正規化（0–100）し、<b>距離{{W_D}}：新しさ{{W_N}}：価格{{W_P}}</b>の加重平均で総合スコアとした。
+<ul>
+<li><b>距離</b>：宇都宮からの推定道路距離。最短＝100、最長＝0。</li>
+<li><b>新しさ</b>：年式スコア（新しいほど高）と走行距離スコア（少ないほど高）の平均。</li>
+<li><b>価格</b>：支払総額。最安＝100、最高＝0。</li>
+</ul>
+</div>
+</div>
+
+<div class="card">
+<h2>取得統計・不明項目の解消手段</h2>
+<div class="note">
+{{STATS}}
+<p style="margin:10px 0 4px">※サンクレイドル（立体駐車場）高さ制限1550mmについて：<span class="tag ok">&#10003;確定</span>ジェイド ハイブリッドX の全高はカタログ値<b>1530mm</b>＝制限内。RS等グレード・タイヤ/エアロで差が出るため、候補確定後に車検証の全高で個別確認を推奨（要確認）。</p>
+<p style="margin:6px 0">※距離は推定値。正確な所要時間は各販売店住所→宇都宮をGoogleマップで実測を推奨。在庫・価格は各物件リンクで商談前に再確認。</p>
+</div>
+</div>
+
+<div class="card"><h2>出典</h2>
+<p class="src">カーセンサー Honda ジェイド 県別一覧（{{DATE}} 自動取得）。個別車両は各行「物件→確認」リンク先が一次表示。本ページはGitHub Actionsにより毎日自動生成。</p></div>
+
+<p class="foot">自動生成：{{DATE}}／中古車情報は流動的です。最終判断前に各リンクと販売店で最新情報をご確認ください。</p>
+</div></body></html>
