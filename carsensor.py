@@ -46,13 +46,18 @@ def _parse_count(soup):
     m = re.search(r"(\d{1,4})\s*台\s*検索する", txt)
     return int(m.group(1)) if m else None
 
-def _num_after(text, label, unit, window=60):
+def _num_after(text, label, unit, window=70):
     i = text.find(label)
     if i < 0:
         return None
     seg = text[i + len(label): i + len(label) + window]
-    m = re.search(r"([\d,]+(?:\.\d+)?)\s*" + re.escape(unit), seg)
-    return float(m.group(1).replace(",", "")) if m else None
+    # 整数部と小数部が別要素で空白分割されるケース（例 "143 .3 万円"）に対応
+    m = re.search(r"(\d[\d,]*)\s*(\.\s*\d+)?\s*" + re.escape(unit), seg)
+    if not m:
+        return None
+    intp = m.group(1).replace(",", "")
+    dec = (m.group(2) or "").replace(" ", "")
+    return float(intp + dec)
 
 def _year(text):
     i = text.find("年式")
@@ -68,16 +73,20 @@ def _distance_and_city(text, pref_name, pref_km):
     return pref_km, pref_name
 
 def _find_card(anchor):
-    """タイトルリンクから、修復歴＋支払総額を含む最小の祖先要素（=カード）を返す"""
+    """タイトルリンクから、修復歴＋支払総額＋所在地(県+市)を含む最小の祖先要素（=カード）を返す"""
     node = anchor
-    for _ in range(10):
+    fallback = None
+    for _ in range(12):
         node = node.parent
         if node is None:
-            return None
+            break
         t = node.get_text(" ", strip=True)
         if "修復歴" in t and "支払総額" in t:
-            return node
-    return None
+            if fallback is None:
+                fallback = node
+            if _PREF_RE.search(t):
+                return node
+    return fallback
 
 def parse_card(card, pref_name, pref_km):
     text = re.sub(r"[　\xa0]", " ", card.get_text(" ", strip=True))
